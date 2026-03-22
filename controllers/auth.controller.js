@@ -5,23 +5,19 @@ const ApiResponse = require('../utils/ApiResponse')
 
 exports.register = catchAsync(async (req, res) => {
     const user = await authService.registerUser(req.body)
-    console.log(req.body)
-    res.status(201).json({
-        success: true,
-        data: user
-    })
+
+    const response = new ApiResponse(201, user, "User registered successfully")
+    res.status(response.statusCode).json(response)
 })
 
 exports.login = catchAsync(async (req, res) => {
     const user = await authService.loginUser(req.body)
-    res.status(200).json({
-        success: true,
-        data: user
-    })
+    
+    const response = new ApiResponse(200, user, "Login successful")
+    res.status(response.statusCode).json(response)
 })
 
 exports.logout = catchAsync(async (req, res) => {
-
     const token = req.body.refreshToken
     if (!token) {
         throw new ApiError(400, "Please provide a refresh token")
@@ -29,25 +25,20 @@ exports.logout = catchAsync(async (req, res) => {
 
     await authService.logoutUser(token)
 
-    res.status(200).json({
-        success: true,
-        message: "Logged out successfully"
-    })
+    const response = new ApiResponse(200, null, "Logged out successfully")
+    res.status(response.statusCode).json(response)
 })
 
 exports.refreshAccessToken = catchAsync(async (req, res) => {
     const token = req.headers['refresh-token']
 
     if (!token) {
-        throw new ApiError(400, "Please provide a access token")
+        // Updated error message to match the logic (refresh token is needed here)
+        throw new ApiError(400, "Please provide a refresh token")
     }
 
     const newAccessToken = await authService.refreshAccessToken(token)
 
-    res.status(200).json({
-        success: true,
-        message: "Refreshed token",
-        newAccessToken
-    })
-
+    const response = new ApiResponse(200, { accessToken: newAccessToken }, "Token refreshed")
+    res.status(response.statusCode).json(response)
 })
