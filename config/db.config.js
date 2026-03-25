@@ -2,7 +2,7 @@ let mongoose = require('mongoose')
 
 async function connectDB () {
     try {
-       await mongoose.connect('mongodb://127.0.0.1:27017/SCI')
+       await mongoose.connect(process.env.MONGODB_URL)
        console.log('DB connected..')
     }catch(error) {
         console.log('Error in DB config')
@@ -11,3 +11,4 @@ async function connectDB () {
 }
 
 module.exports = connectDB
+
