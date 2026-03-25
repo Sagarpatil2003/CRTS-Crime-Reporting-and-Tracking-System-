@@ -7,7 +7,7 @@ exports.getMyCases = catchAsync(async (req, res) => {
     const officerId = req.user.id || req.user._id;
     const result = await CaseService.getOfficerCases(officerId, req.query);
 
-    // 🚩 FIX: result is an object, so we check result.cases.length
+    //  result is an object, check result.cases.length
     const hasCases = result && result.cases && result.cases.length > 0;
 
     res.status(200).json(
