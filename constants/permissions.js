@@ -5,6 +5,7 @@ const permissionsMap = {
   ],
 
   OFFICER: [
+    "ACCEPT_ASSIGNMENT",
     "INVESTIGATE_CASE",
     "VERIFY_EVIDENCE",
     "UPDATE_CASE_STATUS",
