@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
 const EvidenceSchema = new mongoose.Schema({
-  caseId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Case', 
-    required: true, 
-    index: true 
+  caseId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Case',
+    required: true,
+    index: true
   },
-  
-  evidenceType: { 
-    type: String, 
-    enum: ['IMAGE', 'VIDEO', 'DOCUMENT', 'WITNESS_STATEMENT'], 
-    required: true 
+
+  evidenceType: {
+    type: String,
+    enum: ['IMAGE', 'VIDEO', 'DOCUMENT', 'WITNESS_STATEMENT'],
+    required: true
   },
 
   fileUrl: String,
@@ -36,15 +36,24 @@ const EvidenceSchema = new mongoose.Schema({
     enum: ['PENDING', 'VERIFIED', 'REJECTED'],
     default: 'PENDING',
     index: true // Useful for the Officer's "To-be-verified" dashboard
+  },
+
+  isDeleted: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  deletedAt: {
+    type: Date,
+    default: null
   }
-  
 }, { timestamps: true });
 
 
 // This hook ensures that if the type is 'WITNESS_STATEMENT', a fileUrl isn't required, 
 // and vice versa. This is called "Data Integrity."
 
-EvidenceSchema.pre('save', function(next) {
+EvidenceSchema.pre('save', function (next) {
   if (this.evidenceType === 'WITNESS_STATEMENT' && !this.witnessInfo.statement) {
     return next(new Error('Witness statement text is required for this evidence type.'));
   }
@@ -54,4 +63,12 @@ EvidenceSchema.pre('save', function(next) {
   next
 });
 
+
+EvidenceSchema.pre(/^find/, function () {
+  const options = this.getOptions();
+  if (options && options.withDeleted) {
+    return; 
+  }
+  this.where({ isDeleted: { $ne: true } }); // $ne: true is safer than false if field is missing
+});
 module.exports = mongoose.model('Evidence', EvidenceSchema);
