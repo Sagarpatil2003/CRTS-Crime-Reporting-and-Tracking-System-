@@ -10,9 +10,10 @@ exports.register = catchAsync(async (req, res) => {
     res.status(response.statusCode).json(response)
 })
 
+
 exports.login = catchAsync(async (req, res) => {
     const user = await authService.loginUser(req.body)
-    
+
     const response = new ApiResponse(200, user, "Login successful")
     res.status(response.statusCode).json(response)
 })
