@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/user.model')
+const UserModel = require('../models/user.model')
 
 const authMiddleware = async (req, res, next) => {
     try {
@@ -15,8 +15,8 @@ const authMiddleware = async (req, res, next) => {
         const token = authHeader.split(" ")[1]
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
 
-        const user = await User.findById(decoded.id).select('+accountStatus +role')
-
+        const user = await UserModel.findById(decoded.id).select('+accountStatus +role')
+        
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -30,7 +30,7 @@ const authMiddleware = async (req, res, next) => {
                 message: `Account ${user.accountStatus}`
             })
         }
-
+       
         req.user = {
             id: user._id,
             role: user.role
