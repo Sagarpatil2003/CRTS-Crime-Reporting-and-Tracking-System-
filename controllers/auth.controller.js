@@ -17,6 +17,7 @@ exports.login = catchAsync(async (req, res) => {
     res.status(response.statusCode).json(response)
 })
 
+
 exports.logout = catchAsync(async (req, res) => {
     const token = req.body.refreshToken
     if (!token) {
@@ -28,6 +29,7 @@ exports.logout = catchAsync(async (req, res) => {
     const response = new ApiResponse(200, null, "Logged out successfully")
     res.status(response.statusCode).json(response)
 })
+
 
 exports.refreshAccessToken = catchAsync(async (req, res) => {
     const token = req.headers['refresh-token']
