@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { customAlphabet } = require('nanoid');
 const crypto = require("crypto");
 
+
 const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 5);
 
 const CaseSchema = new mongoose.Schema({
@@ -55,16 +56,16 @@ const CaseSchema = new mongoose.Schema({
     ],
     status: {
         type: String,
-        enum: ['REPORTED', 'UNDER_REVIEW', 'INVESTIGATION', 'HEARING', 'JUDGEMENT', 'CLOSED'],
+        enum: ['REPORTED', 'ASSIGNED', 'UNDER_REVIEW', 'ESCALATED', 'UNDER_REVIEW', "PENDING_DISPATCH", 'INVESTIGATION', 'HEARING', 'JUDGEMENT', 'CLOSED'],
         default: 'REPORTED',
         index: true
     },
 
     assignedOfficer: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        default: null
     },
-
 
     aiInsights: {
         complexity: { type: String, enum: ['LOW', 'MEDIUM', 'HIGH'] },
@@ -81,12 +82,50 @@ const CaseSchema = new mongoose.Schema({
     },
 
     isAnonymous: { type: Boolean, default: false },
-    isDeleted: { type: Boolean, default: false }
+    isDeleted: { type: Boolean, default: false },
 
+    isClustered: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    history: [
+        {
+            status: {
+                type: String,
+                enum: ['REPORTED', 'UNDER_REVIEW', 'ASSIGNED','PENDING_DISPATCH','INVESTIGATION', 'HEARING', 'JUDGEMENT', 'CLOSED']
+            },
+            changedBy: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"
+            },
+            reason: String,
+            timestamp: {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
+    clusterSize: {
+        type: Number,
+        default: 0
+    },
+
+    clusterId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Case",
+        default: null
+    },
+
+    assignedAt: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true })
 
+
 CaseSchema.index({ location: "2dsphere" });
-CaseSchema.index({ address: 1 }); 
+CaseSchema.index({ address: 1 });
 CaseSchema.pre('save', function (next) {
 
     if (!this.caseNumber) {
