@@ -1,25 +1,32 @@
+require('dotenv').config()
 const express = require('express');
 const http = require('http'); // 1. Need this to create the server
-const { Server } = require("socket.io");
-const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-const socketManager = require("./sockets/notification.socket");
+
 const connectDB = require('./config/db.config');
+const connectRedis = require('./config/redis.config')
+const globalErrorHandler = require('./middlewares/globalErrorHandler.middleware');
 const authRouter = require('./routes/auth.route');
 const caseRouter = require('./routes/case.routes');
-const globalErrorHandler = require('./middlewares/globalErrorHandler.middleware');
+const evidenceRouter = require('./routes/evidence.route')
+const mapRouter = require('./routes/map.routes')
+const officerRouter = require("./routes/officer.routes")
+const adminRouter = require("./routes/admin.route")
+const { initSocket } = require("./sockets/socket.server")
 
-dotenv.config();
-connectDB();
 
-const app = express();
-const server = http.createServer(app); // 2. Create the HTTP server using the app
+require('./workers/alertWorker')
+require('./workers/case.worker')
+require('./workers/cron.worker')
 
-// 3. Initialize Socket.io with THIS server instance
-const io = new Server(server, { 
-  cors: { origin: "*" } 
-});
+const app = express()
+const server = http.createServer(app)
+
+const io = initSocket(server)
+connectDB()
+
+
 
 // Middleware
 app.use(express.json());
@@ -27,13 +34,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // Routes
-app.use('/auth', authRouter);
-app.use('/case', caseRouter);
+app.use('/auth', authRouter)
+app.use('/case', caseRouter)
+app.use('/evidence', evidenceRouter)
+app.use('/map',mapRouter)
+app.use('/officer', officerRouter)
+app.use('/admin', adminRouter)
 
-// Initialize your custom socket logic
-socketManager.init(io);
 
-// Error Handlers
+
+
 app.use(globalErrorHandler);
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "API route not found" });

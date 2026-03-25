@@ -1,123 +1,123 @@
-const UserModel = require("../models/user.model");
+// const UserModel = require("../models/user.model");
 
-let ioInstance = null;
+// let ioInstance = null;
 
-// Track online users
-const onlineUsers = new Map();
+// // Track online users
+// const onlineUsers = new Map();
 
-const init = (io) => {
+// const init = (io) => {
 
-    if (ioInstance) return ioInstance
+//     if (ioInstance) return ioInstance
 
-    ioInstance = io;
+//     ioInstance = io;
 
-    ioInstance.on("connection", (socket) => {
+//     ioInstance.on("connection", (socket) => {
 
-        const userId = socket.handshake.auth?.userId
+//         const userId = socket.handshake.auth?.userId
 
-        if (!userId) {
-            console.warn("[Socket] Connection rejected: Missing userId", {
-                socketId: socket.id
-            });
-            return;
-        }
+//         if (!userId) {
+//             console.warn("[Socket] Connection rejected: Missing userId", {
+//                 socketId: socket.id
+//             });
+//             return;
+//         }
 
-        const room = userId.toString();
+//         const room = userId.toString();
 
-        socket.join(room);
+//         socket.join(room);
 
-        // store online user
-        onlineUsers.set(room, socket.id);
+//         // store online user
+//         onlineUsers.set(room, socket.id);
 
-        console.log("[Socket] User connected", {
-            userId: room,
-            socketId: socket.id
-        });
+//         console.log("[Socket] User connected", {
+//             userId: room,
+//             socketId: socket.id
+//         });
 
    
-        // OFFICER REAL-TIME LOCATION
+//         // OFFICER REAL-TIME LOCATION
         
-        socket.on("officer:locationUpdate", async (data) => {
+//         socket.on("officer:locationUpdate", async (data) => {
 
-            try {
+//             try {
 
-                const { latitude, longitude } = data;
+//                 const { latitude, longitude } = data;
 
-                if (!latitude || !longitude) return;
+//                 if (!latitude || !longitude) return;
 
-                await UserModel.findByIdAndUpdate(
-                    room,
-                    {
-                        currentLocation: {
-                            type: "Point",
-                            coordinates: [longitude, latitude]
-                        }
-                    },
-                    { new: true }
-                );
+//                 await UserModel.findByIdAndUpdate(
+//                     room,
+//                     {
+//                         currentLocation: {
+//                             type: "Point",
+//                             coordinates: [longitude, latitude]
+//                         }
+//                     },
+//                     { new: true }
+//                 );
 
-                console.log("[Socket] Officer location updated", {
-                    officerId: room,
-                    latitude,
-                    longitude
-                });
+//                 console.log("[Socket] Officer location updated", {
+//                     officerId: room,
+//                     latitude,
+//                     longitude
+//                 });
 
-            } catch (err) {
+//             } catch (err) {
 
-                console.error("[Socket] Location update failed", {
-                    officerId: room,
-                    error: err.message
-                });
+//                 console.error("[Socket] Location update failed", {
+//                     officerId: room,
+//                     error: err.message
+//                 });
 
-            }
+//             }
 
-        });
+//         });
 
      
-        // Disconnect
+//         // Disconnect
       
-        socket.on("disconnect", () => {
+//         socket.on("disconnect", () => {
 
-            onlineUsers.delete(room);
+//             onlineUsers.delete(room);
 
-            console.log("[Socket] User disconnected", {
-                userId: room,
-                socketId: socket.id
-            });
+//             console.log("[Socket] User disconnected", {
+//                 userId: room,
+//                 socketId: socket.id
+//             });
 
-        });
+//         });
 
-    });
+//     });
 
-    return ioInstance;
-};
+//     return ioInstance;
+// };
 
-const getIO = () => {
+// const getIO = () => {
 
-    if (!ioInstance) {
-        throw new Error("Socket.io not initialized. Call init(io) first.");
-    }
+//     if (!ioInstance) {
+//         throw new Error("Socket.io not initialized. Call init(io) first.");
+//     }
 
-    return ioInstance;
-};
+//     return ioInstance;
+// };
 
-const emitToUser = (userId, event, payload) => {
+// const emitToUser = (userId, event, payload) => {
 
-    if (!ioInstance) return;
+//     if (!ioInstance) return;
 
-    ioInstance.to(userId.toString()).emit(event, payload);
+//     ioInstance.to(userId.toString()).emit(event, payload);
 
-};
+// };
 
-const isUserOnline = (userId) => {
+// const isUserOnline = (userId) => {
 
-    return onlineUsers.has(userId.toString());
+//     return onlineUsers.has(userId.toString());
 
-};
+// };
 
-module.exports = {
-    init,
-    getIO,
-    emitToUser,
-    isUserOnline
-};
+// module.exports = {
+//     init,
+//     getIO,
+//     emitToUser,
+//     isUserOnline
+// };
