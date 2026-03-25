@@ -12,6 +12,6 @@ const alertQueue = new Queue("alert-notifications", {
         removeOnComplete: true,
         removeOnFail: false // Keep failed alerts for debugging
     }
-});
+})
 
 module.exports = alertQueue;
