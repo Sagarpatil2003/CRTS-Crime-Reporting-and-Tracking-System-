@@ -2,14 +2,9 @@ const catchAsync = require("../../utils/catchAsync")
 const adminService = require('../../services/admin.service')
 const ApiResponse = require('../../utils/ApiResponse')
 
-exports.assignCaseManually = catchAsync(async (req, res) => {
-    const { id } = req.params; 
-    const { badgeNumber } = req.body;
-
-    // 🚩 Debug: Ensure Admin is logged in
-    if (!req.user) {
-        throw new ApiError(401, "Admin authentication failed");
-    }
+exports.assignCaseManually = catchAsync(async(req, res) => {
+    const { id } = req.params; // Case Id
+    const { badgeNumber } = req.body; // We use Badge Number for the lookup
 
     const reqContext = {
         ip: req.ip,
@@ -17,10 +12,11 @@ exports.assignCaseManually = catchAsync(async (req, res) => {
         source: "ADMIN_PANEL"
     };
 
+    
     const result = await adminService.manualAssignOfficer(
         id,
         badgeNumber,
-        req.user, // Ensure this is the full user object from your auth middleware
+        req.user,
         reqContext
     );
   
