@@ -10,22 +10,11 @@ exports.generateToken = (userId) => {
 }
 
 
-// exports.registerUser = async ({ name, email, role, password,  }) => {
-//     const existing = await UserModel.findOne({ email });
-//     if (existing) throw new ApiError(409, "Email already in use");
-   
-//     const user = await UserModel.create({ name, email, role, password });
-
-//     const userObj = user.toObject();
-//     delete userObj.password;
-
-//     return { name, email, role, password };
-// }
-
 exports.registerUser = async ({ name, email, role, password, location }) => {
+    
     const existing = await UserModel.findOne({ email });
     if (existing) throw new ApiError(409, "Email already in use");
-
+       
     // 1. Ensure location follows GeoJSON format for MongoDB 2dsphere
     // Frontend should send: { coordinates: [72.87, 19.07] }
     const userData = { 
@@ -35,7 +24,7 @@ exports.registerUser = async ({ name, email, role, password, location }) => {
         password,
         location: location || { type: 'Point', coordinates: [0, 0] } 
     };
-
+ 
     const user = await UserModel.create(userData);
 
     const userObj = user.toObject();
