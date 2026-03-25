@@ -1,6 +1,14 @@
 # CRTS-Crime-Reporting-and-Tracking-System-
 The Crime Reporting and Tracking System allows citizens to report incidents, track local crime statistics, and access information about ongoing cases. This platform facilitates the collection of evidence and witness statements while providing transparency in the judicial process.
 
+## 🌐 Live Deployment
+
+🚀 API Base URL:  
+https://crts-crime-reporting-and-tracking-system.onrender.com
+
+> ⚠️ Note: The server may take a few seconds to wake up (hosted on free tier).
+
+
 # 🚨 Crime Reporting & Real-Time Tracking System (Backend)
 
 A production-ready backend system for reporting, tracking, and analyzing crimes with real-time alerts, geo-based queries, and intelligent clustering.
