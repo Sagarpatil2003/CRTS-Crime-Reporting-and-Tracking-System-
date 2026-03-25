@@ -10,7 +10,7 @@ const createCaseSchema = Joi.object({
             'any.required': 'Case title is mandatory'
         }),
     description: Joi.string()
-        .min(70)
+        .min(0)
         .required()
         .trim(),
 
@@ -52,7 +52,7 @@ const createCaseSchema = Joi.object({
         evidenceType: Joi.string().valid('IMAGE', 'VIDEO', 'DOCUMENT', 'WITNESS_STATEMENT').required(),
         fileUrl: Joi.string().uri().required(),
         fileMimeType: Joi.string().required(),
-        fileSize: Joi.number().required()
+        fileSize: Joi.number().optional()    
     }).optional(),
 
     metadata: Joi.object().optional()
@@ -74,7 +74,34 @@ const updateStatusSchema = Joi.object({
 })
 
 
+const nearbyCasesSchema = Joi.object({
+    lat: Joi.number()
+        .min(-90)
+        .max(90)
+        .required(),
+
+    lng: Joi.number()
+        .min(-180)
+        .max(180)
+        .required(),
+
+    radius: Joi.number()
+        .min(1)
+        .max(50)
+        .default(5),
+
+    page: Joi.number()
+        .min(1)
+        .default(1),
+
+    limit: Joi.number()
+        .min(1)
+        .max(50)
+        .default(10)
+});
+
 module.exports = {
     createCaseSchema,
-    updateStatusSchema
-};   
+    updateStatusSchema,
+    nearbyCasesSchema
+}   
